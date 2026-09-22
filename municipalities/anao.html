@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Explore Anao - Tarlac Provincial Tourism</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="shortcut icon" href="../LogoIcon/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href="../style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          void:   '#ffffff',
+          panel:  '#f4f4f5',
+          panel2: '#e4e4e7',
+          ash:    '#d4d4d8',
+          bone:   '#000000',
+          smoke:  '#52525b',
+          ember:  '#0d9488',
+          ember2: '#0f766e',
+          teal:   '#0d9488',
+          tealDim:'#134e4a',
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"IBM Plex Mono"', 'monospace'],
+        },
+      }
+    }
+  }
+</script>
+<style>
+  body { background: #0b0f0d; }
+ 
+  /* ---------- entrance stagger for the icon bar ---------- */
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(18px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .icon-item {
+    animation: riseIn .6s cubic-bezier(.19,1,.22,1) both;
+  }
+ 
+  /* ---------- hover pop + tooltip ---------- */
+  .icon-item .icon-shell {
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1),
+                background-color .35s ease,
+                box-shadow .35s ease,
+                border-color .35s ease;
+  }
+  .icon-item .icon-glyph {
+    transition: transform .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .icon-item:hover .icon-shell,
+  .icon-item:focus-visible .icon-shell {
+    transform: translateY(-8px) scale(1.08);
+    background-color: rgba(255,138,61,0.14);
+    border-color: rgba(255,138,61,0.65);
+    box-shadow: 0 10px 28px -8px rgba(255,138,61,0.55);
+  }
+  .icon-item:hover .icon-glyph,
+  .icon-item:focus-visible .icon-glyph {
+    transform: scale(1.12) rotate(-4deg);
+    color: #ff8a3d;
+  }
+  .icon-item:hover .icon-label,
+  .icon-item:focus-visible .icon-label {
+    color: #f6f3ea;
+  }
+ 
+  /* pop-up tooltip bubble */
+  .icon-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translate(-50%, 8px) scale(.92);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .28s ease, transform .28s cubic-bezier(.34,1.56,.64,1);
+    white-space: normal;
+    max-width: 92px;
+    text-align: center;
+    z-index: 20;
+  }
+  @media (min-width: 640px) {
+    .icon-tooltip { max-width: none; white-space: nowrap; bottom: calc(100% + 12px); }
+  }
+  .icon-item:hover .icon-tooltip,
+  .icon-item:focus-visible .icon-tooltip {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  .icon-item:first-child .icon-tooltip { left: 0; transform: translate(0, 8px) scale(.92); }
+  .icon-item:first-child:hover .icon-tooltip,
+  .icon-item:first-child:focus-visible .icon-tooltip { transform: translate(0, 0) scale(1); }
+  .icon-item:first-child .icon-tooltip::after { left: 20px; transform: none; }
+  .icon-item:last-child .icon-tooltip { left: auto; right: 0; transform: translate(0, 8px) scale(.92); }
+  .icon-item:last-child:hover .icon-tooltip,
+  .icon-item:last-child:focus-visible .icon-tooltip { transform: translate(0, 0) scale(1); }
+  .icon-item:last-child .icon-tooltip::after { left: auto; right: 20px; transform: none; }
+ 
+  .icon-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #14201d;
+  }
+ 
+  @media (hover: none) and (pointer: coarse) {
+    .icon-tooltip { display: none; }
+    .icon-item:active .icon-shell {
+      transform: scale(.94);
+      background-color: rgba(255,138,61,0.18);
+      border-color: rgba(255,138,61,0.65);
+    }
+  }
+ 
+  @keyframes idleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  .icon-item:not(:hover) .icon-shell {
+    animation: idleFloat 5s ease-in-out infinite;
+  }
+  .icon-item:nth-child(1) .icon-shell { animation-delay: 0s; }
+  .icon-item:nth-child(2) .icon-shell { animation-delay: .3s; }
+  .icon-item:nth-child(3) .icon-shell { animation-delay: .6s; }
+  .icon-item:nth-child(4) .icon-shell { animation-delay: .9s; }
+  .icon-item:nth-child(5) .icon-shell { animation-delay: 1.2s; }
+  .icon-item:nth-child(6) .icon-shell { animation-delay: 1.5s; }
+ 
+  @media (prefers-reduced-motion: reduce) {
+    .icon-item, .icon-item .icon-shell, .icon-item .icon-glyph, .icon-tooltip {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  :root{
+    --bone:#1a1f1c;
+    --smoke:#4b544f;
+    --ember:#c05a2c;
+    --ash:#d8ddd8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    background:#fff;
+    color:var(--bone);
+  }
+  .font-display{ font-family: Georgia, 'Times New Roman', serif; }
+
+  #anao{
+    position:relative;
+    padding:8rem 1.5rem 3rem;
+    background: oklch(0.91 0.096 180.426);
+    border-bottom:1px solid var(--ash);
+    overflow:hidden;
+  }
+  .header-inner{
+    position:relative;
+    max-width:72rem;
+    margin:0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    gap:2.5rem;
+    align-items:flex-start;
+  }
+  .header-text{ flex:1 1 380px; min-width:280px; }
+  .header-text h1{ font-size:2.75rem; font-weight:600; margin:0 0 1.25rem; color:var(--bone); }
+  .header-text p{ color:var(--smoke); font-size:1.05rem; line-height:1.7; margin:0 0 1rem; }
+  .header-photo{
+    flex:1 1 320px;
+    min-width:260px;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 18px 40px -18px rgba(0,0,0,.35);
+  }
+  .header-photo img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+ 
+  #destinations{
+    position:relative;
+    padding:5rem 1.5rem;
+    max-width:72rem;
+    margin:0 auto;
+  }
+  .row{
+    display:flex;
+    gap:3rem;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    margin-bottom:5.5rem;
+  }
+  .row:last-child{ margin-bottom:0; }
+  .row.reverse{ flex-direction:row-reverse; }
+  .col-text{ flex:1 1 380px; min-width:280px; }
+  .col-text h2{ font-size:1.9rem; font-weight:600; margin:0 0 1rem; color:var(--bone); }
+  .col-text p{ color:var(--smoke); font-size:.98rem; line-height:1.7; margin:0 0 .9rem; }
+ 
+  /* ---------- collage ---------- */
+  .col-collage{
+    flex:1 1 320px;
+    min-width:280px;
+    position:relative;
+    height:340px;
+  }
+  .collage-img{
+    position:absolute;
+    border-radius:10px;
+    box-shadow:0 14px 30px -12px rgba(0,0,0,.4);
+    overflow:hidden;
+    background:#eee;
+    opacity:0;
+    transform:scale(.55) rotate(var(--rot,0deg));
+    transition:opacity .55s cubic-bezier(.2,.9,.25,1), transform .55s cubic-bezier(.2,.9,.25,1);
+  }
+  .collage-img img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+  .collage-img.pop-in{
+    opacity:1;
+    transform:scale(1) rotate(var(--rot,0deg));
+  }
+ 
+  @media (prefers-reduced-motion: reduce){
+    .collage-img{ transition:none; opacity:1; transform:scale(1) rotate(var(--rot,0deg)); }
+  }
+
+  /* ================= LIGHTBOX (click-to-expand) ================= */
+  .collage-img img,
+  .header-photo img,
+  .deal-img-wrap img{
+    cursor: zoom-in;
+    transition: transform .5s cubic-bezier(.25,.46,.45,.94), filter .5s ease;
+    will-change: transform;
+  }
+  .collage-img:hover img,
+  .header-photo:hover img{
+    transform: scale(1.06);
+    filter: brightness(1.03);
+  }
+
+  #lightbox{
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 4vw;
+    background: rgba(10, 14, 12, 0);
+    backdrop-filter: blur(0px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease, background-color .35s ease, backdrop-filter .35s ease;
+  }
+  #lightbox.is-open{
+    opacity: 1;
+    pointer-events: auto;
+    background: rgba(10, 14, 12, 0.86);
+    backdrop-filter: blur(6px);
+  }
+  #lightbox-figure{
+    position: relative;
+    max-width: min(1100px, 92vw);
+    max-height: 88vh;
+    transform: scale(.85);
+    opacity: 0;
+    transition: transform .4s cubic-bezier(.19,1,.22,1), opacity .4s ease;
+  }
+  #lightbox.is-open #lightbox-figure{
+    transform: scale(1);
+    opacity: 1;
+  }
+  #lightbox-img{
+    display: block;
+    max-width: min(1100px, 92vw);
+    max-height: 88vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,.65);
+  }
+  #lightbox-caption{
+    margin-top: .9rem;
+    text-align: center;
+    color: #f4f1ea;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: .92rem;
+    letter-spacing: .01em;
+    opacity: .85;
+  }
+  #lightbox-close{
+    position: absolute;
+    top: -18px;
+    right: -18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: #f4f1ea;
+    color: #1a1f1c;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -6px rgba(0,0,0,.5);
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1), background-color .25s ease;
+  }
+  #lightbox-close:hover{ transform: scale(1.1); background:#fff; }
+  @media (max-width: 640px){
+    #lightbox-close{ top: -14px; right: 0; }
+  }
+
+  #lightbox-prev,
+  #lightbox-next{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(244,241,234,0.15);
+    border: 1px solid rgba(244,241,234,0.35);
+    color: #f4f1ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color .25s ease, transform .25s ease;
+  }
+  #lightbox-prev{ left: -60px; }
+  #lightbox-next{ right: -60px; }
+  #lightbox-prev:hover,
+  #lightbox-next:hover{ background: rgba(244,241,234,0.3); transform: translateY(-50%) scale(1.08); }
+  @media (max-width: 900px){
+    #lightbox-prev{ left: 8px; }
+    #lightbox-next{ right: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #lightbox, #lightbox-figure, #lightbox-close, #lightbox-prev, #lightbox-next,
+    .collage-img img, .header-photo img, .deal-img-wrap img{
+      transition: none !important;
+    }
+  }
+
+  /* ================= DEAL CARD IMAGE (fits card, smooth fade+scale in, no distortion) ================= */
+  .deal-img-wrap{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #d7e6e4;
+    border-radius: 1rem 1rem 0 0;
+  }
+  .deal-img-wrap img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    opacity: 0;
+    transform: scale(1.08);
+    transition: opacity .6s cubic-bezier(.19,1,.22,1), transform .6s cubic-bezier(.19,1,.22,1);
+  }
+  .deal-img-wrap img.pop-in{
+    opacity: 1;
+    transform: scale(1);
+  }
+  .deal-card:hover .deal-img-wrap img.pop-in{
+    transform: scale(1.08);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .deal-img-wrap img{ transition:none; opacity:1; transform:scale(1); }
+  }
+
+  Z
+  
+</style>
+</head>
+
+<body class="bg-void text-bone font-body antialiased">
+ 
+  <!-- ===================== ANIMATED HERO LOGO ===================== -->
+  <div id="logo-stage">
+    <div class="stage-glow"></div>
+    <div id="logo-visual"><img src="../LogoIcon/Tourismlogo.png" alt="Tarlac Tourism logo"></div>
+  </div>
+ 
+  <!-- ===================== CUSTOM CURSOR ===================== -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+ 
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[oklch(0.704 0.14 182.503)] border-b border-ash">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
+      
+      <!-- 1. LOGO -->
+      <a href="../index.html" data-hover class="font-display text-xl tracking-tight flex items-center gap-3">
+        <span class="w-8 h-8 rounded-full border border-ember/60 flex items-center justify-center text-ember text-xs font-mono">
+          <img src="../LogoIcon/favicon.ico" class="logo-spin" />
+        </span>
+        <span>TARLAC <span class="text-ember">TOURISM</span></span>
+      </a>
+  
+      <!-- 2. DESKTOP NAVIGATION -->
+      <nav class="hidden lg:flex items-center gap-9 font-mono text-[15px] tracking-wide text-smoke">
+        <a href="../index.html" data-hover class="nav-link hover:text-bone transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          HOME
+        </a>
+        <a href="../map.html" data-hover class="nav-link hover:text-bone transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+            <line x1="9" y1="3" x2="9" y2="18"></line>
+            <line x1="15" y1="6" x2="15" y2="21"></line>
+          </svg>
+          MAP
+        </a>
+        <a href="../accommodation/accommodations.html" data-hover class="nav-link hover:text-bone transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 4v16"></path>
+            <path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+            <path d="M2 17h20"></path>
+            <path d="M6 8v9"></path>
+          </svg>
+          ACCOMMODATIONS
+        </a>
+        <div class="relative megamenu-group">
+          <button id="megaMenuBtn" data-hover aria-expanded="false" aria-controls="mega-menu"
+            class="nav-link hover:text-bone transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            UNLOCK TARLAC
+            <svg id="megaMenuChevron" width="10" height="6" viewBox="0 0 10 6" fill="none" class="transition-transform duration-300"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4"/></svg>
+          </button>
+        </div>
+        <a href="../about.html" data-hover class="nav-link hover:text-bone transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4"></path>
+            <path d="M12 8h.01"></path>
+          </svg>
+          ABOUT
+        </a>
+      </nav>
+  
+      <!-- 3. RIGHT SIDE CONTROLS -->
+      <div class="flex items-center gap-4">
+        <a href="#destinations" data-hover class="magnetic hidden md:inline-flex items-center gap-2 border border-ember/60 text-ember font-mono text-sm tracking-wider px-5 py-2.5 rounded-full hover:bg-ember hover:text-void transition-colors">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          EXPLORE ANAO
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="ml-1"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.4"/></svg>
+        </a>
+        <button id="menuBtn" data-hover aria-label="Open menu" aria-expanded="false" class="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 border border-ash rounded-full">
+          <span class="hamburger-line block w-4 h-px bg-bone transition-all duration-300"></span>
+          <span class="hamburger-line block w-4 h-px bg-bone transition-all duration-300"></span>
+        </button>
+      </div>
+    </div> 
+
+    <!-- ===================== MEGA MENU PANEL ===================== -->
+    <div id="mega-menu"
+      class="hidden absolute top-full left-0 w-full bg-[oklch(0.704_0.14_182.503)] border-t border-b border-ash shadow-2xl"
+      role="region" aria-label="Unlock Tarlac menu">
+      
+      <!-- Close button -->
+      <button id="megaMenuClose" data-hover aria-label="Close menu"
+        class="absolute top-5 right-6 md:right-10 w-9 h-9 rounded-full border border-ash flex items-center justify-center text-smoke hover:text-ember hover:border-ember transition-colors">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6"/></svg>
+      </button>
+
+      <div class="max-w-7xl mx-auto px-6 md:px-10 py-10 md:py-12">
+        <!-- Tabs -->
+        <div class="flex items-center gap-8 font-mono text-sm tracking-wide mb-8 border-b border-ash pb-4">
+          <button data-mega-tab="categories" class="mega-tab text-bone font-semibold relative pb-1">Tourism Categories</button>
+          <button data-mega-tab="municipalities" class="mega-tab text-smoke hover:text-bone transition-colors relative pb-1">Municipalities &amp; City</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8 md:gap-12">
+          <div>
+            <div class="rounded-xl overflow-hidden aspect-[4/3] mb-5">
+              <img src="../YourDayAtDioramaImages/historyTarlac.jpg" alt="Diwa ng Tarlac" class="w-full h-full object-cover" />
+            </div>
+            <h3 class="font-display font-bold text-xl mb-2">Diwa ng Tarlac</h3>
+            <p class="text-sm text-smoke leading-relaxed">From the province's top destinations to sites off the beaten path — unlock every corner of Tarlac.</p>
+          </div>
+          <div>
+            <!-- Panel: Tourism Categories -->
+            <div data-mega-panel="categories" class="mega-panel grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4 font-body text-[15px] font-medium">
+              <a href="../adventures.html" data-hover class="hover:text-ember transition-colors">Adventure</a>
+              <a href="../eco-tourism.html" data-hover class="hover:text-ember transition-colors">Eco-Tourism</a>
+              <a href="../festivals.html" data-hover class="hover:text-ember transition-colors">Festivals</a>
+              <a href="../food.html" data-hover class="hover:text-ember transition-colors">Food</a>
+              <a href="../religion.html" data-hover class="hover:text-ember transition-colors">Faith</a>
+              <a href="../accommodation/accommodations.html" data-hover class="hover:text-ember transition-colors">Accommodations</a>
+              <a href="../diorama.html" data-hover class="hover:text-ember transition-colors">Museo ng Kanlahi</a>
+              <a href="../statistic.html" data-hover class="hover:text-ember transition-colors">Visitor Insights</a>
+              <a href="../map.html" data-hover class="hover:text-ember transition-colors">Province Map</a>
+              <a href="../tourismofficer.html" data-hover class="hover:text-ember transition-colors">Tourism Officers</a>
+            </div>
+            <!-- Panel: Municipalities -->
+            <div data-mega-panel="municipalities" class="mega-panel hidden grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4 font-body text-[15px] font-medium">
+              <a href="anao.html" data-hover class="hover:text-ember transition-colors font-semibold text-ember">Anao</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Bamban</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Capas</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Camiling</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Concepcion</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Gerona</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">La Paz</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Mayantoc</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Moncada</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Paniqui</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Pura</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Ramos</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">San Clemente</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Santa Ignacia</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">San Manuel</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">San Jose</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Tarlac City</a>
+              <a href="#" data-hover class="hover:text-ember transition-colors">Victoria</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- 4. MOBILE SLIDE-DOWN MENU (Placed strictly inside header, outside the flex container) -->
+    <div id="mobileMenu" class="lg:hidden max-h-0 overflow-hidden transition-[max-height] duration-400 ease-in-out bg-[#00a8a6] border-t border-ash">
+      <nav class="flex flex-col px-6 py-6 gap-1 font-mono text-base tracking-wide">
+        
+        <a href="../index.html" data-hover class="flex items-center gap-3 py-3 border-b border-ash text-bone">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          HOME
+        </a>
+        
+        <a href="../map.html" data-hover class="flex items-center gap-3 py-3 border-b border-ash text-bone">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+            <line x1="9" y1="3" x2="9" y2="18"></line>
+            <line x1="15" y1="6" x2="15" y2="21"></line>
+          </svg>
+          MAP
+        </a>
+        
+        <a href="../accommodation/accommodations.html" data-hover class="flex items-center gap-3 py-3 border-b border-ash text-bone">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 4v16"></path>
+            <path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+            <path d="M2 17h20"></path>
+            <path d="M6 8v9"></path>
+          </svg>
+          ACCOMMODATIONS
+        </a>
+        
+        <!-- ===== UNLOCK TARLAC — Mobile Mega Menu ===== -->
+        <div class="pt-4 pb-3">
+          <p class="text-xs text-smoke uppercase tracking-widest flex items-center gap-2 mb-4">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Unlock Tarlac
+          </p>
+
+          <!-- Tabs -->
+          <div class="flex items-center gap-6 font-mono text-xs tracking-wide mb-4 border-b border-ash pb-3">
+            <button data-mega-tab-m="categories" class="mega-tab-m text-bone font-semibold">
+              Tourism Categories
+            </button>
+            <button data-mega-tab-m="municipalities" class="mega-tab-m text-smoke">
+              Municipalities &amp; City
+            </button>
+          </div>
+
+          <!-- Panel: Tourism Categories -->
+          <div data-mega-panel-m="categories" class="mega-panel-m grid grid-cols-2 gap-x-4 gap-y-1 font-body text-sm font-medium">
+            <a href="../adventures.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Adventure</a>
+            <a href="../eco-tourism.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Eco-Tourism</a>
+            <a href="../festivals.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Festivals</a>
+            <a href="../food.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Food</a>
+            <a href="../religion.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Faith</a>
+            <a href="../accommodation/accommodations.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Accommodations</a>
+            <a href="../diorama.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Museo ng Kanlahi</a>
+            <a href="../statistic.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Visitor Insights</a>
+            <a href="../map.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Province Map</a>
+            <a href="../tourismofficer.html" data-hover class="hover:text-ember transition-colors">Tourism Officers</a>
+          </div>
+
+          <!-- Panel: Municipalities -->
+          <div data-mega-panel-m="municipalities" class="mega-panel-m hidden grid grid-cols-2 gap-x-4 gap-y-1 font-body text-sm font-medium">
+            <a href="anao.html" data-hover class="py-2 text-bone hover:text-ember transition-colors">Anao</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Bamban</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Capas</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Camiling</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Concepcion</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Gerona</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">La Paz</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Mayantoc</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Moncada</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Paniqui</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Pura</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Ramos</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">San Clemente</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Santa Ignacia</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">San Manuel</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">San Jose</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors font-semibold text-ember">Tarlac City</a>
+            <a href="#" data-hover class="py-2 text-bone hover:text-ember transition-colors">Victoria</a>
+          </div>
+        </div>
+
+        <a href="../about.html" data-hover class="flex items-center gap-3 py-3 border-y border-ash text-bone">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4"></path>
+            <path d="M12 8h.01"></path>
+          </svg>
+          ABOUT
+        </a>
+        
+        <a href="#" data-hover class="mt-5 inline-flex items-center justify-center gap-2 border border-ember/60 text-ember px-5 py-3 rounded-full text-sm">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          Back
+        </a>
+        
+      </nav>
+    </div>
+  </header>
+
+
+    
+<!-- ===================== HERO ===================== -->
+<section class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+ 
+  <!-- background photo -->
+  <div class="absolute inset-0 -z-10">
+    <img src="../municipalities/photos/ANAO-32.jpg"
+         alt="Ylang-ylang blossom, Anao"
+         class="w-full h-full object-cover" />
+    <div class="absolute inset-0 bg-gradient-to-t from-void via-void/30 to-void/10"></div>
+    <div class="absolute inset-0 bg-void/25"></div>
+  </div>
+ 
+  <!-- headline + icon bar, centered together as one block -->
+  <div class="w-full flex flex-col items-center text-center px-5 sm:px-6 md:px-10 gap-5 sm:gap-6">
+    <h1 class="font-display font-800 text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-none tracking-tight text-bone drop-shadow-lg">
+      Anao
+    </h1>
+    <a href="#unlock" data-hover
+       class="magnetic inline-flex items-center gap-2 bg-teal/90 hover:bg-teal text-void font-mono text-xs sm:text-sm tracking-wider px-4 sm:px-6 py-2.5 sm:py-3 rounded-full transition-colors">
+      DISCOVER
+    </a>
+ 
+    <!-- ===================== ANIMATED ICON BAR ===================== -->
+    <div id="unlock" class="relative w-full max-w-6xl mt-4 sm:mt-6 md:mt-8">
+      
+      <nav aria-label="Explore by category"
+           class="grid grid-cols-3 sm:grid-cols-6
+                  gap-y-5 gap-x-2 sm:gap-x-3 md:gap-x-5 lg:gap-x-8
+                  bg-transparent px-3 sm:px-5 md:px-8 lg:px-10 py-5 sm:py-6 md:py-7 lg:py-8">
+ 
+        <!-- Eco-Tourism -->
+        <a href="../eco-tourism.html" data-hover
+           class="icon-item relative flex flex-col items-center gap-2 sm:gap-2.5 md:gap-3 group outline-none"
+           style="animation-delay:.05s">
+          <span class="icon-tooltip bg-[oklch(0.6_0.118_184.704)] text-bone text-xs font-mono px-3 py-1.5 rounded-full border border-white/10">
+            Explore Eco-Tourism
+          </span>
+          <span class="icon-shell w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border border-white/15 bg-[oklch(0.91_0.096_180.426)] group-hover:bg-[oklch(0.6_0.118_184.704)] transition-colors duration-300 flex items-center justify-center shadow-lg hover:shadow-xl">
+            <svg class="icon-glyph w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 20h16"/><path d="M6 20l3-9 3 4 2-3 4 8"/><circle cx="18" cy="6" r="3"/>
+            </svg>
+          </span>
+          <span class="icon-label font-mono text-[9px] leading-tight sm:text-[11px] md:text-sm tracking-wide text-smoke text-center transition-colors break-words">Eco-Tourism</span>
+        </a>
+ 
+        <!-- Adventure -->
+        <a href="../adventures.html" data-hover
+           class="icon-item relative flex flex-col items-center gap-2 sm:gap-2.5 md:gap-3 group outline-none"
+           style="animation-delay:.15s">
+          <span class="icon-tooltip bg-[oklch(0.6_0.118_184.704)] text-bone text-xs font-mono px-3 py-1.5 rounded-full border border-white/10">
+            Chase the Adventure
+          </span>
+          <span class="icon-shell w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border border-white/15 bg-[oklch(0.91_0.096_180.426)] group-hover:bg-[oklch(0.6_0.118_184.704)] transition-colors duration-300 flex items-center justify-center shadow-lg hover:shadow-xl">
+            <svg class="icon-glyph w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="13.5" cy="6.5" r="1.5"/><path d="M4 21l6-9 3 3 3-6 4 12"/>
+            </svg>
+          </span>
+          <span class="icon-label font-mono text-[9px] leading-tight sm:text-[11px] md:text-sm tracking-wide text-smoke text-center transition-colors break-words">Adventure</span>
+        </a>
+ 
+        <!-- Food -->
+        <a href="../food.html" data-hover
+           class="icon-item relative flex flex-col items-center gap-2 sm:gap-2.5 md:gap-3 group outline-none"
+           style="animation-delay:.25s">
+          <span class="icon-tooltip bg-[oklch(0.6_0.118_184.704)] text-bone text-xs font-mono px-3 py-1.5 rounded-full border border-white/10">
+            Taste Local Food
+          </span>
+          <span class="icon-shell w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border border-white/15 bg-[oklch(0.91_0.096_180.426)] group-hover:bg-[oklch(0.6_0.118_184.704)] transition-colors duration-300 flex items-center justify-center shadow-lg hover:shadow-xl">
+            <svg class="icon-glyph w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3v7a2 2 0 0 0 2 2v9"/><path d="M6 3v7"/><path d="M10 3v7"/>
+              <path d="M17 3c-2 1-2 4-2 6a2 2 0 0 0 2 2v10"/>
+            </svg>
+          </span>
+          <span class="icon-label font-mono text-[9px] leading-tight sm:text-[11px] md:text-sm tracking-wide text-smoke text-center transition-colors break-words">Food</span>
+        </a>
+ 
+        <!-- Faith -->
+        <a href="../religion.html" data-hover
+           class="icon-item relative flex flex-col items-center gap-2 sm:gap-2.5 md:gap-3 group outline-none"
+           style="animation-delay:.35s">
+          <span class="icon-tooltip bg-[oklch(0.6_0.118_184.704)] text-bone text-xs font-mono px-3 py-1.5 rounded-full border border-white/10">
+            Faith &amp; Pilgrimage
+          </span>
+          <span class="icon-shell w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border border-white/15 bg-[oklch(0.91_0.096_180.426)] group-hover:bg-[oklch(0.6_0.118_184.704)] transition-colors duration-300 flex items-center justify-center shadow-lg hover:shadow-xl">
+            <svg class="icon-glyph w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v6"/><path d="M9 5h6"/>
+              <path d="M6 21V11l6-4 6 4v10"/><path d="M10 21v-6h4v6"/>
+            </svg>
+          </span>
+          <span class="icon-label font-mono text-[9px] leading-tight sm:text-[11px] md:text-sm tracking-wide text-smoke text-center transition-colors break-words">Faith</span>
+        </a>
+ 
+        <!-- Accommodation -->
+        <a href="../accommodation/accommodations.html" data-hover
+           class="icon-item relative flex flex-col items-center gap-2 sm:gap-2.5 md:gap-3 group outline-none"
+           style="animation-delay:.45s">
+          <span class="icon-tooltip bg-[oklch(0.6_0.118_184.704)] text-bone text-xs font-mono px-3 py-1.5 rounded-full border border-white/10">
+            Find Accommodation
+          </span>
+          <span class="icon-shell w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border border-white/15 bg-[oklch(0.91_0.096_180.426)] group-hover:bg-[oklch(0.6_0.118_184.704)] transition-colors duration-300 flex items-center justify-center shadow-lg hover:shadow-xl">
+            <svg class="icon-glyph w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21V7l7-4 7 4v14"/><path d="M3 21h18"/><path d="M10 21v-6h4v6"/><path d="M7 10h.01M13 10h.01M7 14h.01M13 14h.01"/>
+            </svg>
+          </span>
+          <span class="icon-label font-mono text-[9px] leading-tight sm:text-[11px] md:text-sm tracking-wide text-smoke text-center transition-colors break-words">Accommodation</span>
+        </a>
+ 
+        <!-- Festival -->
+        <a href="../festivals.html" data-hover
+           class="icon-item relative flex flex-col items-center gap-2 sm:gap-2.5 md:gap-3 group outline-none"
+           style="animation-delay:.55s">
+          <span class="icon-tooltip bg-[oklch(0.6_0.118_184.704)] text-bone text-xs font-mono px-3 py-1.5 rounded-full border border-white/10">
+            Catch a Festival
+          </span>
+          <span class="icon-shell w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border border-white/15 bg-[oklch(0.91_0.096_180.426)] group-hover:bg-[oklch(0.6_0.118_184.704)] transition-colors duration-300 flex items-center justify-center shadow-lg hover:shadow-xl">
+            <svg class="icon-glyph w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 8l3-3 3 3 3-3 3 3 3-3 3 3"/>
+              <path d="M5 8v11"/><path d="M19 8v11"/><path d="M5 19h14"/><path d="M9 19v-5h6v5"/>
+            </svg>
+          </span>
+          <span class="icon-label font-mono text-[9px] leading-tight sm:text-[11px] md:text-sm tracking-wide text-smoke text-center transition-colors break-words">Festival</span>
+        </a>
+ 
+      </nav>
+    </div>
+  </div>
+</section>
+
+   <!-- ============ QUICK TICKER ============ -->
+   <div class="border-y border-line bg-panel/60 overflow-hidden py-3">
+  <div class="animate-ticker font-mono text-[11px] tracking-widest text-inkdim">
+    
+    <!-- First Set of Towns -->
+    <span class="flex items-center gap-16 pr-16">
+      <span>Anao</span><span class="text-gold">·</span>
+      <span>Bamban</span><span class="text-gold">·</span>
+      <span>Capas</span><span class="text-gold">·</span>
+      <span>Camiling</span><span class="text-gold">·</span>
+      <span>Concepcion</span><span class="text-gold">·</span>
+      <span>Gerona</span><span class="text-gold">·</span>
+      <span>La Paz</span><span class="text-gold">·</span>
+      <span>Mayantoc</span><span class="text-gold">·</span>
+      <span>Moncada</span><span class="text-gold">·</span>
+      <span>Paniqui</span><span class="text-gold">·</span>
+      <span>Pura</span><span class="text-gold">·</span>
+      <span>Ramos</span><span class="text-gold">·</span>
+      <span>San Clemente</span><span class="text-gold">·</span>
+      <span>Santa Ignacia</span><span class="text-gold">·</span>
+      <span>San Manuel</span><span class="text-gold">·</span>
+      <span>San Jose</span><span class="text-gold">·</span>
+      <span>Tarlac City</span><span class="text-gold">·</span>
+      <span>Victoria</span><span class="text-gold">·</span>
+    </span>
+
+    <!-- Second Set of Towns (Duplicated for the seamless loop) -->
+    <span class="flex items-center gap-16 pr-16" aria-hidden="true">
+      <span>Anao</span><span class="text-gold">·</span>
+      <span>Bamban</span><span class="text-gold">·</span>
+      <span>Capas</span><span class="text-gold">·</span>
+      <span>Camiling</span><span class="text-gold">·</span>
+      <span>Concepcion</span><span class="text-gold">·</span>
+      <span>Gerona</span><span class="text-gold">·</span>
+      <span>La Paz</span><span class="text-gold">·</span>
+      <span>Mayantoc</span><span class="text-gold">·</span>
+      <span>Moncada</span><span class="text-gold">·</span>
+      <span>Paniqui</span><span class="text-gold">·</span>
+      <span>Pura</span><span class="text-gold">·</span>
+      <span>Ramos</span><span class="text-gold">·</span>
+      <span>San Clemente</span><span class="text-gold">·</span>
+      <span>Santa Ignacia</span><span class="text-gold">·</span>
+      <span>San Manuel</span><span class="text-gold">·</span>
+      <span>San Jose</span><span class="text-gold">·</span>
+      <span>Tarlac City</span><span class="text-gold">·</span>
+      <span>Victoria</span><span class="text-gold">·</span>
+    </span>
+
+  </div>
+</div>
+
+  <!-- ===================== PAGE HEADER (ANAO) ===================== -->
+
+<section id="anao" style="margin-top: -8rem;">
+  <div class="header-inner">
+    <div class="header-text" style="text-align: left;">
+  <h1 class="font-display">Municipality of Anao</h1>
+  <p>Dubbed as the &ldquo;Ylang-Ylang Capital of the Philippines,&rdquo; Anao has effortlessly established itself as a preferred choice for travelers seeking a serene agricultural respite and to experience a plethora of eco-tourism attractions, verdant parks, fragrant essential oil extraction industries, and profound historical sites.</p>
+  <p>As the smallest municipality in Tarlac, Anao takes immense pride in its clean, green environment and was recognized for its exemplary community-based heritage preservation and agricultural prowess.</p>
+
+  <!-- 3-Image Collage -->
+  <div class="col-collage mt-8">
+  <div class="collage-img" style="width:44%;height:52%;top:0;left:6%;--rot:-4deg;">
+    <img src="photos/ANAO-32.jpg" alt="Ylang-ylang bud">
+  </div>
+  <div class="collage-img" style="width:52%;height:46%;top:4%;right:0;--rot:3deg;">
+    <img src="photos/ANAO-12.jpg" alt="Ylang-ylang flower cluster">
+  </div>
+  <div class="collage-img" style="width:48%;height:44%;bottom:0;right:8%;--rot:-2deg;">
+    <img src="photos/ANAO-20.jpg" alt="Festival food dish">
+  </div>
+</div>
+</div>
+    
+    
+    <!-- Nilagyan ng text-align: center para pumagitna ang video -->
+          <div class="header-photo" style="text-align: center; background: transparent; border: none; box-shadow: none;">
+            <!-- Set max-width to a typical phone size (350px) and aspect-ratio to 9/19.5 (iPhone ratio) -->
+            <video autoplay loop muted controls playsinline style="width: 100%; max-width: 350px; aspect-ratio: 9 / 19.5; object-fit: cover; margin: 0 auto; display: block; border-radius: 36px; background: transparent; border: none; outline: none;">
+              <source src="../municipalities/video/ANAO REELS (1).mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+  </div>
+</section>
+ 
+<section id="destinations">
+ 
+  <!-- Item 1 -->
+  <article class="row">
+    <div class="col-text">
+      <h2 class="font-display">Ylang-Ylang Festival</h2>
+      <p>Recognized for its fragrant natural surroundings, Anao presents an ideal destination for visitors seeking an immersive experience of the Ylang-Ylang Festival. This celebration takes place annually, honoring the town's primary livelihood and the beautiful blossoms that line its streets.</p>
+      <p>This festival incorporates numerous traditional Filipino elements, including vibrant street performances, agricultural fairs, and a showcase of locally produced essential oils, soaps, and perfumes. It serves as a beautiful tribute to the hardworking farmers and the distinct identity of Anao.</p>
+    </div>
+    <div class="col-collage">
+      <div class="collage-img" style="width:44%;height:52%;top:0;left:6%;--rot:-4deg;">
+        <img src="photos/ANAO-32.jpg" alt="Ylang-ylang bud">
+      </div>
+      <div class="collage-img" style="width:52%;height:46%;top:4%;right:0;--rot:3deg;">
+        <img src="photos/ANAO-12.jpg" alt="Ylang-ylang flower cluster">
+      </div>
+      <div class="collage-img" style="width:48%;height:44%;bottom:0;right:8%;--rot:-2deg;">
+        <img src="photos/ANAO-20.jpg" alt="Festival food dish">
+      </div>
+    </div>
+  </article>
+ 
+  <!-- Item 2 -->
+  <article class="row reverse">
+    <div class="col-text">
+      <h2 class="font-display">Anao Town Plaza</h2>
+      <p>Anao Town Plaza, one of the municipality's premier attractions, stands as a testament to the town's commitment to the environment, perfected with lush greenery and centuries-old trees. Engage in rejuvenating activities such as afternoon strolls or simple relaxation to savor the plaza's captivating and peaceful atmosphere.</p>
+    </div>
+    <div class="col-collage" style="height:260px;">
+      <div class="collage-img" style="width:60%;height:80%;top:5%;left:10%;--rot:-3deg;">
+        <img src="photos/ANAO-35.jpg" alt="Anao Town Plaza">
+      </div>
+      <div class="collage-img" style="width:40%;height:50%;bottom:0;right:4%;--rot:4deg;">
+        <img src="photos/ANAO-33.jpg" alt="Plaza trees">
+      </div>
+    </div>
+  </article>
+ 
+  <!-- Item 3 -->
+  <article class="row">
+    <div class="col-text">
+      <h2 class="font-display">St. John Nepomucene Parish</h2>
+      <p>Anao&rsquo;s most magnificent historical edifice, the St. John Nepomucene Parish, boasts a solemn interior adored by both locals and pilgrims. Perched majestically in the town proper, it offers a quiet sanctuary for visitors exploring the northern towns of Tarlac.</p>
+      <p>Renowned for its deep historical roots, the parish accommodates generations of faithful Tarlaqueños, remaining a central pillar to the town's cultural and spiritual heritage.</p>
+    </div>
+    <div class="col-collage">
+      <div class="collage-img" style="width:56%;height:70%;top:0;left:4%;--rot:-3deg;">
+        <img src="photos/ANAO-21.jpg" alt="St. John Nepomucene Parish facade">
+      </div>
+      <div class="collage-img" style="width:44%;height:44%;bottom:0;right:2%;--rot:5deg;">
+        <img src="photos/ANAO-18.jpg" alt="Parish interior">
+      </div>
+    </div>
+  </article>
+ 
+  <!-- Item 4 -->
+  <article class="row reverse">
+    <div class="col-text">
+      <h2 class="font-display">Ylang-Ylang Extraction Center</h2>
+      <p>Situated at the heart of the municipality, the Ylang-Ylang Extraction Center is a must-visit for anyone intrigued by the town's title. The facility showcases the meticulous process of extracting high-grade essential oils from freshly harvested Ylang-Ylang flowers.</p>
+      <p>From its viewing areas, visitors can observe local artisans and agricultural workers transform raw petals into world-class perfumes, soaps, and massage oils, which are also available for purchase as premium souvenirs.</p>
+    </div>
+    <div class="col-collage">
+      <div class="collage-img" style="width:42%;height:48%;top:0;left:2%;--rot:-4deg;">
+        <img src="photos/ANAO-25.jpg" alt="Ylang-ylang oil bottles">
+      </div>
+      <div class="collage-img" style="width:50%;height:42%;top:6%;right:0;--rot:3deg;">
+        <img src="photos/ANAO-9.jpg" alt="Handmade soap bars">
+      </div>
+      <div class="collage-img" style="width:46%;height:44%;bottom:0;left:16%;--rot:-2deg;">
+        <img src="photos/ANAO-32.jpg" alt="Oil extraction process">
+      </div>
+    </div>
+  </article>
+ 
+</section>
+
+  <!-- ===================== EXCITING DEALS FOR YOU ===================== -->
+<section class="relative py-20 px-6 md:px-10 bg-panel border-t border-ash overflow-hidden">
+  <div class="contour-bg"></div>
+  <div class="max-w-7xl mx-auto">
+    
+    <div class="mb-10 text-center">
+      <h2 class="reveal font-display text-3xl md:text-4xl font-semibold text-bone mb-3">Exciting Deals For You</h2>
+      <p class="reveal reveal-delay-1 text-smoke text-sm">Whether planned or spontaneous, genuine experiences are at the heart of every traveler's journey in Anao.</p>
+    </div>
+
+    <!-- Filters Simulation -->
+    <div class="reveal reveal-delay-2 flex flex-wrap items-center justify-center gap-3 mb-12">
+      <select id="activity-filter" class="font-body text-sm bg-void border border-ash rounded-lg px-4 py-2.5 focus:outline-none focus:border-ember transition-colors">
+        <option>Select Activity</option>
+        <option value="Attractions">Attractions</option>
+        <option value="Tours">Tours</option>
+        <option value="Shopping">Shopping</option>
+      </select>
+      <button id="reset-filter" class="bg-ash text-smoke font-mono text-xs px-5 py-3 rounded-lg hover:bg-ember hover:text-void transition-colors">RESET</button>
+    </div>
+
+    <!-- Deals Grid -->
+    <div class="grid md:grid-cols-3 gap-6" id="deals-grid">
+      <!-- Deal 1 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-32.jpg" alt="Discover the best of Anao" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">DISCOVER THE BEST OF ANAO</h3>
+            <p class="text-sm text-smoke leading-relaxed">Discover the best of the Ylang-Ylang Capital! Enjoy affordable tours to the extraction centers and local farms.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+
+      <!-- Deal 2 -->
+      <a href="#" data-category="Attractions" data-hover class="tilt-card deal-card reveal reveal-delay-1 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-12.jpg" alt="Fun Farm Full-Day Tour" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">Fun Farm Full-Day Tour</h3>
+            <p class="text-sm text-smoke leading-relaxed">This immersive 8-hour journey blends hands-on nature experiences with local agri-tourism, taking you through DIY essential oil making.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+
+      <!-- Deal 3 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-20.jpg" alt="Anao Cultural Tour" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+      
+      <!-- Deal 4 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-35.jpg" alt="Anao Cultural Tour 4" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 4</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+
+      <!-- Deal 5 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-33.jpg" alt="Anao Cultural Tour 5" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 5</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+
+      <!-- Deal 6 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-21.jpg" alt="Anao Cultural Tour 6" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 6</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+      <!-- Deal 7 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-18.jpg" alt="Anao Cultural Tour 5" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 5</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+
+      <!-- Deal 8 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-25.jpg" alt="Anao Cultural Tour 6" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 6</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+      <!-- Deal 9 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-9.jpg" alt="Anao Cultural Tour 5" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 5</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+
+      <!-- Deal 10 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-32.jpg" alt="Anao Cultural Tour 6" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 6</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+      <!-- Deal 11 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-12.jpg" alt="Anao Cultural Tour 5" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 5</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+
+      <!-- Deal 12 -->
+      <a href="#" data-category="Tours" data-hover class="tilt-card deal-card reveal reveal-delay-2 relative rounded-2xl group">
+        <div class="tilt-glow"></div>
+        <div class="tilt-inner relative rounded-2xl overflow-hidden bg-[oklch(0.777_0.152_181.912)] border border-[#00786f] shadow-lg shadow-[oklch(0.953_0.051_180.801)] h-full flex flex-col">
+          <div class="deal-img-wrap"><img src="photos/ANAO-20.jpg" alt="Anao Cultural Tour 6" loading="lazy" decoding="async"></div>
+          <div class="p-6 flex-grow">
+            <span class="inline-block font-mono text-[10px] bg-[oklch(0.953_0.051_180.801)] text-[#00786f] px-2 py-1 rounded mb-3">DOT ACCREDITED</span>
+            <h3 class="font-display text-xl mb-2 group-hover:text-ember transition-colors">ANAO CULTURAL TOUR 6</h3>
+            <p class="text-sm text-smoke leading-relaxed">Immerse yourself in the rich culture, creativity, and craftsmanship as you explore renowned historical sites in town.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-[#00786f] flex items-center gap-2 text-xs text-smoke font-mono">
+            <svg class="w-3 h-3 text-ember" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.58 7-12.5A7 7 0 105 9.5C5 14.42 12 22 12 22z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Anao, Tarlac
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Load More Button Section -->
+<div class="relative z-50 mt-10 text-center">
+  <button id="load-more-btn" class="font-mono text-xs uppercase tracking-widest text-[#00786f] border border-[#00786f] px-6 py-3 rounded-full hover:bg-[oklch(0.855_0.138_181.071)] hover:text-white transition-colors cursor-pointer">Load More</button>
+</div>
+
+  </div>
+</section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="border-t border-ash py-8 px-6 md:px-10">
+    <div class="max-w-2xl mx-auto flex flex-col items-center text-center">
+      
+      <!-- Top Branding Logo -->
+      <div class="mb-5 w-full max-w-xs md:max-w-sm px-4">
+        <img class="w-full h-auto object-contain mx-auto" src="../LogoIcon/branding.png" alt="Tarlac Tourism Branding" />
+      </div>
+
+      <!-- Social & Contact Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-left font-body text-sm text-bone font-medium mb-5">
+        <a href="https://www.facebook.com/tarlactourism" target="_blank" data-hover class="flex items-center gap-2 hover:text-ember transition-colors">
+          <svg class="w-4 h-4 shrink-0 text-bone" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+          <span class="text-sm font-medium">Facebook</span>
+        </a>
+        <a href="mailto:tarlac.tourism2017@gmail.com" data-hover class="flex items-center gap-2 hover:text-ember transition-colors">
+          <svg class="w-4 h-4 shrink-0 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <span class="text-sm font-medium">Gmail</span>
+        </a>
+        <a href="https://www.instagram.com/tarlactourism" target="_blank" data-hover class="flex items-center gap-2 hover:text-ember transition-colors">
+          <svg class="w-4 h-4 shrink-0 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span class="text-sm font-medium">Instagram</span>
+        </a>
+        <a href="tel:+639998893869" data-hover class="flex items-center gap-2 hover:text-ember transition-colors">
+          <svg class="w-4 h-4 shrink-0 text-bone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          <span class="text-sm font-medium underline underline-offset-4 decoration-1">+63 999 889 3869</span>
+        </a>
+      </div>
+
+      <!-- Copyright Line -->
+      <p class="text-smoke text-[11px] md:text-xs italic font-body">
+        © 2026 Tarlac Provincial Tourism Office, Diwa ng Tarlac. All Rights Reserved.
+      </p>
+
+    </div>
+  </footer>
+
+  <!-- ===================== LIGHTBOX (click-to-expand popup) ===================== -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <div id="lightbox-figure">
+      <button id="lightbox-close" aria-label="Close image viewer">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 2l14 14M16 2L2 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <button id="lightbox-prev" aria-label="Previous image">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 3l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <img id="lightbox-img" src="" alt="">
+      <button id="lightbox-next" aria-label="Next image">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 3l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p id="lightbox-caption"></p>
+    </div>
+  </div>
+
+  <script src="../main.js"></script>
+
+  <script>
+    // ===================== LIGHTBOX LOGIC =====================
+    (function () {
+      const lightbox   = document.getElementById('lightbox');
+      const lbImg       = document.getElementById('lightbox-img');
+      const lbCaption   = document.getElementById('lightbox-caption');
+      const btnClose    = document.getElementById('lightbox-close');
+      const btnPrev     = document.getElementById('lightbox-prev');
+      const btnNext      = document.getElementById('lightbox-next');
+
+      let currentGroup = [];
+      let currentIndex = 0;
+      let lastFocused  = null;
+
+      function groupFor(img) {
+        const container = img.closest('.col-collage') || img.closest('.header-photo') || img.closest('.deal-img-wrap');
+        if (!container) return [img];
+        return Array.from(container.querySelectorAll('img'));
+      }
+
+      function show(index) {
+        currentIndex = (index + currentGroup.length) % currentGroup.length;
+        const img = currentGroup[currentIndex];
+        lbImg.src = img.currentSrc || img.src;
+        lbImg.alt = img.alt || '';
+        lbCaption.textContent = img.alt || '';
+        const multi = currentGroup.length > 1;
+        btnPrev.style.display = multi ? 'flex' : 'none';
+        btnNext.style.display = multi ? 'flex' : 'none';
+      }
+
+      function open(img) {
+        lastFocused = document.activeElement;
+        currentGroup = groupFor(img);
+        currentIndex = currentGroup.indexOf(img);
+        show(currentIndex);
+        lightbox.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        btnClose.focus();
+      }
+
+      function close() {
+        lightbox.classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (lastFocused) lastFocused.focus();
+      }
+
+      document.querySelectorAll('.collage-img img, .header-photo img, .deal-img-wrap img').forEach((img) => {
+        img.setAttribute('tabindex', '0');
+        img.setAttribute('role', 'button');
+        img.setAttribute('aria-label', 'View full image: ' + (img.alt || ''));
+        img.addEventListener('click', (e) => { e.preventDefault(); open(img); });
+        img.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(img); }
+        });
+      });
+
+      btnClose.addEventListener('click', close);
+      btnPrev.addEventListener('click', () => show(currentIndex - 1));
+      btnNext.addEventListener('click', () => show(currentIndex + 1));
+
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) close();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('is-open')) return;
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowLeft') show(currentIndex - 1);
+        if (e.key === 'ArrowRight') show(currentIndex + 1);
+      });
+    })();
+
+    // ===================== COLLAGE POP-IN (scroll reveal) =====================
+    document.querySelectorAll('.col-collage').forEach(collage => {
+      const imgs = collage.querySelectorAll('.collage-img');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            imgs.forEach((el, i) => setTimeout(() => el.classList.add('pop-in'), i * 140));
+            io.disconnect();
+          }
+        });
+      }, { threshold: 0.2 });
+      io.observe(collage);
+    });
+
+    // ===================== DEAL CARD IMAGE FADE-IN (scroll reveal) =====================
+    document.querySelectorAll('.deal-img-wrap').forEach((wrap, i) => {
+      const img = wrap.querySelector('img');
+      if (!img) return;
+      const reveal = () => img.classList.add('pop-in');
+      if (img.complete) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) { setTimeout(reveal, (i % 3) * 90); io.disconnect(); }
+          });
+        }, { threshold: 0.15 });
+        io.observe(wrap);
+      } else {
+        img.addEventListener('load', () => {
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) { setTimeout(reveal, (i % 3) * 90); io.disconnect(); }
+            });
+          }, { threshold: 0.15 });
+          io.observe(wrap);
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
